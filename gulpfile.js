@@ -3,6 +3,7 @@ var gulp = require('gulp'),
 	coffee = require('gulp-coffee'),
 	browserify = require('gulp-browserify'),
 	compass = require('gulp-compass'),
+	connect = require('gulp-connect'),
 	concat = require('gulp-concat');
 
 var coffeeSources = ['components/coffee/tagline.coffee']; //Array of locations of coffee script files.
@@ -29,6 +30,7 @@ gulp.task('js', function() {
 		.pipe(concat('script.js')) //unify the scripts
 		.pipe(browserify()) //add libraries and unify
 		.pipe(gulp.dest('builds/development/js')) //export unify js to location.
+		.pipe(connect.reload()) //reload the server with the connect task
 });
 
 
@@ -44,15 +46,28 @@ gulp.task('compass', function() {
     .on('error', gutil.log))
 }); 
 
+//Fix to Compass bug not pasing the css to other pipes, everything that need to be made after the CSS is created is piped here.
+gulp.task('realoadMasterCss', function() {
+  gulp.src('builds/development/css/style.css')
+    .pipe(connect.reload()) //reload the server with the connect task
+}); 
+
 gulp.task('watch', function() {
 	gulp.watch(coffeeSources, ['coffee']);
 	gulp.watch(jsSources, ['js']);
 	gulp.watch('components/sass/*.scss', ['compass']);
-}); 
+	gulp.watch('builds/development/css/style.css', ['realoadMasterCss']); //watcher for the css-compass fix.
+});
 
+gulp.task('connect', function() {
+	connect.server({
+		root: 'builds/development/',
+		livereload: true
+	});
+});
 
 
 //default task runs when calling just gulp in cmd
-gulp.task('default', ['coffee', 'js', 'compass', 'watch']);
+gulp.task('default', ['coffee', 'js', 'connect', 'watch', 'compass']);
 
 
