@@ -53,6 +53,6 @@ gulp.task('watch', function() {
 
 
 //default task runs when calling just gulp in cmd
-gulp.task('default', ['coffee', 'js', 'compass']);
+gulp.task('default', ['coffee', 'js', 'compass', 'watch']);
 
 
