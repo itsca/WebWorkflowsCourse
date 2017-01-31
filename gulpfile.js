@@ -43,6 +43,6 @@ gulp.task('compass', function() {
 }); 
 //Exports sass docs to css pipe in to compass with the sass options(output location css:)
 
-
-
+gulp.task('default', ['coffee', 'js', 'compass']);
+//default task runs when calling just gulp in cmd
 
