@@ -31,6 +31,8 @@ gulp.task('js', function() {
 		.pipe(gulp.dest('builds/development/js')) //export unify js to location.
 });
 
+
+//Exports sass docs to css pipe in to compass with the sass options(output location css:)
 gulp.task('compass', function() {
   gulp.src(sassSources)
     .pipe(compass({
@@ -41,8 +43,16 @@ gulp.task('compass', function() {
     })
     .on('error', gutil.log))
 }); 
-//Exports sass docs to css pipe in to compass with the sass options(output location css:)
 
-gulp.task('default', ['coffee', 'js', 'compass']);
+gulp.task('watch', function() {
+	gulp.watch(coffeeSources, ['coffee']);
+	gulp.watch(jsSources, ['js']);
+	gulp.watch('components/sass/*.scss', ['compass']);
+}); 
+
+
+
 //default task runs when calling just gulp in cmd
+gulp.task('default', ['coffee', 'js', 'compass']);
+
 
