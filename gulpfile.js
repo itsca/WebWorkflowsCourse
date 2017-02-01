@@ -7,6 +7,7 @@ var gulp = require('gulp'),
 	gulpif = require('gulp-if'),
 	uglify = require('gulp-uglify'),
 	minifyHTML = require('gulp-minify-html'),
+	jsonminify = require('gulp-jsonminify'),
 	concat = require('gulp-concat');
 
 var env,
@@ -86,7 +87,9 @@ gulp.task('html', function() {
 }); 
 
 gulp.task('json', function() {
-  gulp.src(jsonSources)
+  gulp.src('builds/development/js/*.json')
+  	.pipe(gulpif(env === 'production', jsonminify()))
+  	.pipe(gulpif(env === 'production', gulp.dest('builds/production/js')))
     .pipe(connect.reload()) //reload the server with the connect task
 }); 
 
@@ -94,7 +97,7 @@ gulp.task('watch', function() {
 	gulp.watch(coffeeSources, ['coffee']);
 	gulp.watch(jsSources, ['js']);
 	gulp.watch('builds/development/*.html', ['html']);
-	gulp.watch(jsonSources, ['json']);
+	gulp.watch('builds/development/js/*.json', ['json']);
 	gulp.watch('components/sass/*.scss', ['compass']);
 	gulp.watch(outputDir + 'css/style.css', ['realoadMasterCss']); //watcher for the css-compass fix.
 });
