@@ -6,17 +6,38 @@ var gulp = require('gulp'),
 	connect = require('gulp-connect'),
 	concat = require('gulp-concat');
 
-var coffeeSources = ['components/coffee/tagline.coffee']; //Array of locations of coffee script files.
-var jsSources = [
+var env,
+	coffeeSources,
+	jsSources,
+	sassSources,
+	htmlSources,
+	jsonSources,
+	outputDir,
+	sassStyle;
+
+
+env = process.env.NODE_ENV || 'development';
+
+if (env ==='development') {
+	outputDir = 'builds/development/';
+	sassStyle = 'expanded';
+}else {
+	outputDir = 'builds/production/';
+	sassStyle = 'compressed';
+};
+
+
+coffeeSources = ['components/coffee/tagline.coffee']; //Array of locations of coffee script files.
+jsSources = [
 	'components/scripts/rclick.js',
 	'components/scripts/pixgrid.js',
 	'components/scripts/tagline.js',
 	'components/scripts/template.js'
 	]; //Array of locations of js script files to unify(concat).
 
-var sassSources = ['components/sass/style.sass']; //Array of locations of sass files to process(compass).
-var htmlSources = ['builds/development/*.html']; //Array of locations of html files.
-var jsonSources = ['builds/development/js/*.json']; //Array of locations of json files.
+sassSources = ['components/sass/style.sass']; //Array of locations of sass files to process(compass).
+htmlSources = [outputDir + '*.html']; //Array of locations of html files.
+jsonSources = [outputDir + 'js/*.json']; //Array of locations of json files.
 
 gulp.task('coffee', function() {
 	gulp.src(coffeeSources) //Location of the coffee script.
@@ -30,7 +51,7 @@ gulp.task('js', function() {
 	gulp.src(jsSources) //location of js scripts
 		.pipe(concat('script.js')) //unify the scripts
 		.pipe(browserify()) //add libraries and unify
-		.pipe(gulp.dest('builds/development/js')) //export unify js to location.
+		.pipe(gulp.dest(outputDir + 'js')) //export unify js to location.
 		.pipe(connect.reload()) //reload the server with the connect task
 });
 
@@ -39,17 +60,17 @@ gulp.task('js', function() {
 gulp.task('compass', function() {
   gulp.src(sassSources)
     .pipe(compass({
-      css: 'builds/development/css', 
+      css: outputDir + 'css', 
       sass: 'components/sass',
-      image: 'builds/development/images',
-      style: 'expanded'
+      image: outputDir + 'images',
+      style: sassStyle
     })
     .on('error', gutil.log))
 }); 
 
 //Fix to Compass bug not pasing the css to other pipes, everything that need to be made after the CSS is created is piped here.
 gulp.task('realoadMasterCss', function() {
-  gulp.src('builds/development/css/style.css')
+  gulp.src(outputDir + 'css/style.css')
     .pipe(connect.reload()) //reload the server with the connect task
 }); 
 
@@ -69,12 +90,12 @@ gulp.task('watch', function() {
 	gulp.watch(htmlSources, ['html']);
 	gulp.watch(jsonSources, ['json']);
 	gulp.watch('components/sass/*.scss', ['compass']);
-	gulp.watch('builds/development/css/style.css', ['realoadMasterCss']); //watcher for the css-compass fix.
+	gulp.watch(outputDir + 'css/style.css', ['realoadMasterCss']); //watcher for the css-compass fix.
 });
 
 gulp.task('connect', function() {
 	connect.server({
-		root: 'builds/development/',
+		root: outputDir,
 		livereload: true
 	});
 });
