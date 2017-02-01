@@ -4,6 +4,8 @@ var gulp = require('gulp'),
 	browserify = require('gulp-browserify'),
 	compass = require('gulp-compass'),
 	connect = require('gulp-connect'),
+	gulpif = require('gulp-if'),
+	uglify = require('gulp-uglify'),
 	concat = require('gulp-concat');
 
 var env,
@@ -51,6 +53,7 @@ gulp.task('js', function() {
 	gulp.src(jsSources) //location of js scripts
 		.pipe(concat('script.js')) //unify the scripts
 		.pipe(browserify()) //add libraries and unify
+		.pipe(gulpif(env === 'production', uglify()))
 		.pipe(gulp.dest(outputDir + 'js')) //export unify js to location.
 		.pipe(connect.reload()) //reload the server with the connect task
 });
