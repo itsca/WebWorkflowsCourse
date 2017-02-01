@@ -15,7 +15,8 @@ var jsSources = [
 	]; //Array of locations of js script files to unify(concat).
 
 var sassSources = ['components/sass/style.sass']; //Array of locations of sass files to process(compass).
-
+var htmlSources = ['builds/development/*.html']; //Array of locations of html files.
+var jsonSources = ['builds/development/js/*.json']; //Array of locations of json files.
 
 gulp.task('coffee', function() {
 	gulp.src(coffeeSources) //Location of the coffee script.
@@ -52,9 +53,21 @@ gulp.task('realoadMasterCss', function() {
     .pipe(connect.reload()) //reload the server with the connect task
 }); 
 
+gulp.task('html', function() {
+  gulp.src(htmlSources)
+    .pipe(connect.reload()) //reload the server with the connect task
+}); 
+
+gulp.task('json', function() {
+  gulp.src(jsonSources)
+    .pipe(connect.reload()) //reload the server with the connect task
+}); 
+
 gulp.task('watch', function() {
 	gulp.watch(coffeeSources, ['coffee']);
 	gulp.watch(jsSources, ['js']);
+	gulp.watch(htmlSources, ['html']);
+	gulp.watch(jsonSources, ['json']);
 	gulp.watch('components/sass/*.scss', ['compass']);
 	gulp.watch('builds/development/css/style.css', ['realoadMasterCss']); //watcher for the css-compass fix.
 });
@@ -68,6 +81,6 @@ gulp.task('connect', function() {
 
 
 //default task runs when calling just gulp in cmd
-gulp.task('default', ['coffee', 'js', 'connect', 'watch', 'compass']);
+gulp.task('default', ['coffee', 'js', 'html', 'json', 'connect', 'watch', 'compass']);
 
 
